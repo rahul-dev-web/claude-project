@@ -1,4 +1,4 @@
-const { supabase } = require('../server');
+const { supabase } = require('../supabaseClient');
 
 // Get user's servers
 const getUserServers = async (discordId) => {

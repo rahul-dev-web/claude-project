@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { supabase } = require('../server');
+const { supabase, supabaseAdmin } = require('../supabaseClient');
 
 const DISCORD_API = 'https://discord.com/api/v10';
 
@@ -44,8 +44,8 @@ const discordCallback = async (code) => {
 
     const guilds = guildsResponse.data.filter(g => (g.permissions & 0x08) === 0x08); // ADMIN permission
 
-    // Step 4: Upsert user in database
-    const { data: user, error: userError } = await supabase
+    // Step 4: Upsert user in database (using admin client to bypass RLS)
+    const { data: user, error: userError } = await supabaseAdmin
       .from('users')
       .upsert(
         {
@@ -63,9 +63,9 @@ const discordCallback = async (code) => {
       throw new Error(`Database error: ${userError.message}`);
     }
 
-    // Step 5: Store guilds in database
+    // Step 5: Store guilds in database (using admin client)
     for (const guild of guilds) {
-      await supabase
+      await supabaseAdmin
         .from('servers')
         .upsert(
           {

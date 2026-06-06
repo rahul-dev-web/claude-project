@@ -1,4 +1,5 @@
 const rateLimit = require('express-rate-limit');
+const { ipKeyGenerator } = rateLimit;
 
 // Per-user rate limiter
 const userLimiter = rateLimit({
@@ -16,9 +17,7 @@ const userLimiter = rateLimit({
     if (req.query.userId) {
       return `user-${req.query.userId}`;
     }
-    // Safely get IP address (handles IPv4 and IPv6)
-    const ip = req.ip || req.connection.remoteAddress || req.socket.remoteAddress;
-    return `ip-${ip}`;
+    return `ip-${ipKeyGenerator(req)}`;
   }
 });
 
@@ -34,9 +33,7 @@ const minuteLimiter = rateLimit({
     return req.path === '/api/health';
   },
   keyGenerator: (req, res) => {
-    // Get IP safely for minute limiting
-    const ip = req.ip || req.connection.remoteAddress || req.socket.remoteAddress;
-    return `minute-${ip}`;
+    return `minute-${ipKeyGenerator(req)}`;
   }
 });
 
@@ -58,8 +55,7 @@ const serverLimiter = rateLimit({
       return `guild-${guildId}`;
     }
     // Fallback
-    const ip = req.ip || req.connection.remoteAddress || req.socket.remoteAddress;
-    return `guild-fallback-${ip}`;
+    return `guild-fallback-${ipKeyGenerator(req)}`;
   }
 });
 

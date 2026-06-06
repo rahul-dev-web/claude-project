@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { getAIResponse, validateAIResponse } = require('../controllers/groqController');
 const { storeActionResult, logAuditEvent } = require('../controllers/discordController');
-const { supabase } = require('../server');
+const { supabase } = require('../supabaseClient');
 
 // POST /api/ai/process
 router.post('/process', async (req, res) => {

@@ -27,9 +27,12 @@ export default function AuthCallbackPage() {
     const authenticate = async () => {
       try {
         const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
-        
+        const frontendUrl = 'http://localhost:5173' || window.location.origin;
+        console.log('Backend URL:', backendUrl);
+        console.log('Frontend URL:', frontendUrl);
+        console.log('Received code:', code);
         const response = await axios.get(
-          `${backendUrl}/api/auth/discord/callback?code=${code}`
+          `${frontendUrl}/api/auth/discord/callback?code=${code}`
         );
 
         if (response.data.success) {

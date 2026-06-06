@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { getUserServers, getActionHistory } = require('../controllers/discordController');
-const { supabase } = require('../server');
+const { supabase } = require('../supabaseClient');
 
 // GET /api/discord/servers
 router.get('/servers', async (req, res) => {
