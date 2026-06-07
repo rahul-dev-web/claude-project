@@ -13,6 +13,9 @@ export default function AIWorkspace({ server, user, onActionExecuted }) {
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
+  // ── Resolve userId: prefer Supabase UUID (id), fallback to discordId ──
+  const resolvedUserId = user?.id || user?.discordId || null;
+
   useEffect(() => {
     checkBotStatus();
   }, []);
@@ -33,8 +36,8 @@ export default function AIWorkspace({ server, user, onActionExecuted }) {
         `${backendUrl}/api/discord/execute`,
         {
           guildId: server.id,
-          userId: user.id,
-          discordId: user.discordId,
+          userId: resolvedUserId,
+          discordId: user?.discordId,
           action: actionData.action,
           parameters: actionData.parameters
         },
@@ -70,6 +73,15 @@ export default function AIWorkspace({ server, user, onActionExecuted }) {
     e.preventDefault();
     if (!prompt.trim()) return;
 
+    // Guard: if userId still missing, show a clear error instead of sending bad request
+    if (!resolvedUserId) {
+      setResponse({
+        error: true,
+        message: 'User session missing. Please log out and log in again.'
+      });
+      return;
+    }
+
     setLoading(true);
     setResponse(null);
 
@@ -79,7 +91,7 @@ export default function AIWorkspace({ server, user, onActionExecuted }) {
         {
           prompt: prompt,
           guildId: server.id,
-          userId: user.id
+          userId: resolvedUserId   // ← fixed: uses resolvedUserId with fallback
         },
         {
           headers: {
